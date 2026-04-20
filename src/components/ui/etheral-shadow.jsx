@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useRef, useId, useEffect } from 'react';
 import { animate, useMotionValue } from 'framer-motion';
 

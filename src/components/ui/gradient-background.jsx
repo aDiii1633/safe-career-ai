@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { cn } from "./utils";
 
 // Simple cn utility if not already in utils

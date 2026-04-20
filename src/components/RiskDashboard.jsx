@@ -8,7 +8,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointE
 const RiskDashboard = ({ userData, analysisData }) => {
   const { jobTitle, industry } = userData;
   const { 
-    globalRiskScore, automationRiskScore, demandTrend, skillGapScore, missingSkills, timeToAchieve, financeRiskScore, financeLevel, roiTimeline, personalAlignment, keyVulnerabilities, safeSkills
+    globalRiskScore, automationRiskScore, demandTrend, skillGapScore, missingSkills, timeToAchieve, financeRiskScore, financeLevel, roiTimeline, personalAlignment
   } = analysisData;
 
   const getRiskColor = (score, inverse = false) => {

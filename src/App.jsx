@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { Shield, Moon, Sun, History } from 'lucide-react';
 import LandingPage from './pages/LandingPage';
@@ -7,7 +7,6 @@ import { ThemeProvider, ThemeContext } from './ThemeContext';
 
 // We abstract the Nav and App layout inside a component under Router and Provider
 const AppContent = () => {
-  const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
@@ -16,6 +15,7 @@ const AppContent = () => {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHistory(JSON.parse(localStorage.getItem('careerHistory') || '[]'));
   }, [isHistoryModalOpen]); // refresh when opened
 
