@@ -1,20 +1,21 @@
-// SafeCareer AI Service — Gemini 2.0 Flash (v1beta) for all AI calls
-// Perplexity is server-side only (CORS blocked in browser), so Gemini handles everything.
+import OpenAI from 'openai';
 
-const getGeminiKey = () => {
-  const key = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!key) throw new Error('Missing VITE_GEMINI_API_KEY');
-  return key;
+// SafeCareer AI Service — Migrated to OpenAI (GPT-4o-mini)
+
+const getOpenAIClient = () => {
+  const key = import.meta.env.VITE_OPENAI_API_KEY;
+  if (!key) throw new Error('Missing VITE_OPENAI_API_KEY. Please add your OpenAI key.');
+  return new OpenAI({
+    apiKey: key,
+    dangerouslyAllowBrowser: true // For purely client-side MVP without backend
+  });
 };
-
-const GEMINI_URL = (key) =>
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
 
 // ─────────────────────────────────────────────────────────────
 // 1. CAREER RISK ANALYSIS — Strict JSON schema output
 // ─────────────────────────────────────────────────────────────
 export const calculateV2Analysis = async (userData) => {
-  const apiKey = getGeminiKey();
+  const openai = getOpenAIClient();
   const { jobTitle, industry, experience, currentSkills, requiredSkills, eduCost } = userData;
 
   const systemPrompt = `You are a Career Risk Analysis Engine with deep knowledge of global job markets, AI automation trends, and workforce economics.
@@ -42,27 +43,17 @@ Output ONLY raw JSON matching this schema exactly. No markdown, no explanation:
 - Upskill Budget: $${eduCost || 0}`;
 
   try {
-    const res = await fetch(GEMINI_URL(apiKey), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-        generationConfig: { temperature: 0.15 },
-      }),
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.15,
     });
 
-    if (!res.ok) {
-      if (res.status === 429) return generateMockFallback(userData);
-      const err = await res.text();
-      console.error('Gemini Analysis Error:', err);
-      throw new Error(`API Error: ${res.status}`);
-    }
-
-    const data = await res.json();
-    let content = data.candidates[0].content.parts[0].text.trim();
-    if (content.startsWith('```')) content = content.replace(/```json|```/g, '').trim();
-
+    let content = response.choices[0].message.content.trim();
     const ai = JSON.parse(content);
 
     const autoRisk    = ai.automationRiskScore || 0;
@@ -90,8 +81,10 @@ Output ONLY raw JSON matching this schema exactly. No markdown, no explanation:
       safeSkills:          ai.safeSkills || [],
     };
   } catch (err) {
-    if (err.message?.includes('429')) return generateMockFallback(userData);
-    console.error('Analysis failed:', err);
+    if (err?.error?.code === 'insufficient_quota' || err?.error?.type === 'insufficient_quota' || String(err).includes('429')) {
+       return generateMockFallback(userData);
+    }
+    console.error('OpenAI Analysis Error:', err);
     throw err;
   }
 };
@@ -118,10 +111,10 @@ const generateMockFallback = ({ jobTitle = '', industry = '' }) => {
 };
 
 // ─────────────────────────────────────────────────────────────
-// 3. AI CHAT — Gemini 2.0 Flash with expert career system prompt
+// 3. AI CHAT — GPT-4o-mini with expert career system prompt
 // ─────────────────────────────────────────────────────────────
 export const chatWithAgent = async (messages, userData = {}, analysisData = {}) => {
-  const apiKey = getGeminiKey();
+  const openai = getOpenAIClient();
 
   const hasProfile = !!(userData?.jobTitle);
   const systemPrompt = hasProfile
@@ -146,40 +139,30 @@ Help users understand their career risk, find safe paths forward, and make smart
 Keep answers concise, specific, and actionable. Use bullet points. Be encouraging.
 Invite them to fill in the Risk Analyzer form for a personalized score.`;
 
-  // Build Gemini-format conversation (filter out initial bot greeting to avoid role issues)
+  // Build OpenAI-format conversation map 
   const conversation = messages
-    .filter(m => !(m.role === 'assistant' && messages.indexOf(m) === 0))
+    .filter(m => m.content.trim()) // filter empty out
     .map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
+      role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: m.content,
     }));
 
-  // Ensure conversation starts with user role
-  if (!conversation.length || conversation[0].role !== 'user') {
-    conversation.unshift({ role: 'user', parts: [{ text: 'Hello' }] });
-  }
-
   try {
-    const res = await fetch(GEMINI_URL(apiKey), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: conversation,
-        generationConfig: { temperature: 0.7, maxOutputTokens: 512 },
-      }),
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...conversation
+      ],
+      temperature: 0.7,
+      max_tokens: 512,
     });
 
-    if (!res.ok) {
-      if (res.status === 429) return '⚠️ Rate limit hit. Please wait a moment and try again!';
-      const err = await res.text();
-      console.error('Chat API error:', err);
-      throw new Error(`API Error: ${res.status}`);
-    }
-
-    const data = await res.json();
-    return data.candidates[0].content.parts[0].text;
+    return response.choices[0].message.content;
   } catch (err) {
+    if (err?.error?.code === 'insufficient_quota' || err?.error?.type === 'insufficient_quota' || String(err).includes('429')) {
+       return '⚠️ Rate limit / Quota hit on API key. Please wait a moment or check your OpenAI account balance.';
+    }
     console.error('Chat error:', err);
     throw err;
   }
