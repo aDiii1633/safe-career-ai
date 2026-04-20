@@ -1,0 +1,13 @@
+# Files NOT uploaded to Google Cloud Build
+node_modules/
+dist/
+dist-ssr/
+.git/
+.vscode/
+.idea/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db

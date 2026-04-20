@@ -1,0 +1,32 @@
+# Dependencies (installed fresh inside Docker)
+node_modules/
+
+# Build output (built inside Docker)
+dist/
+dist-ssr/
+
+# Git & IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Environment files — NEVER bake secrets into images!
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Docs (not needed in image)
+README.md
+
+# Google Cloud Build / deploy config (not needed at runtime)
+.gcloudignore
+cloudbuild.yaml

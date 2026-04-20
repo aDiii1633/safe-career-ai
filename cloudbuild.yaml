@@ -1,0 +1,87 @@
+# cloudbuild.yaml — Google Cloud Build CI/CD pipeline
+# Triggered on push to main branch (configure in Cloud Console → Cloud Build → Triggers)
+#
+# Required substitutions (set in Cloud Build trigger or pass with --substitutions):
+#   _SERVICE_NAME   : Cloud Run service name   (e.g. safe-career-ai)
+#   _REGION         : Cloud Run region          (e.g. us-central1)
+#   _PROJECT_ID     : Your GCP project ID
+#
+# Store API keys in Secret Manager, then reference them below.
+# Never put plaintext secrets in this file!
+
+substitutions:
+  _SERVICE_NAME: safe-career-ai
+  _REGION: us-central1
+  _IMAGE: gcr.io/$PROJECT_ID/${_SERVICE_NAME}
+
+steps:
+  # ── Step 1: Build the Docker image ──────────────────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    args:
+      - 'build'
+      - '--tag'
+      - '${_IMAGE}:$COMMIT_SHA'
+      - '--tag'
+      - '${_IMAGE}:latest'
+      # Pass Vite build-time env vars from Secret Manager
+      - '--build-arg'
+      - 'VITE_GEMINI_API_KEY=$$GEMINI_KEY'
+      - '--build-arg'
+      - 'VITE_PERPLEXITY_API_KEY=$$PERPLEXITY_KEY'
+      - '.'
+    secretEnv:
+      - 'GEMINI_KEY'
+      - 'PERPLEXITY_KEY'
+
+  # ── Step 2: Push image to Container Registry ────────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '${_IMAGE}'
+    waitFor: ['build-image']
+
+  # ── Step 3: Deploy to Cloud Run ─────────────────────────────────────────────
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-cloud-run'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image'
+      - '${_IMAGE}:$COMMIT_SHA'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+    waitFor: ['push-image']
+
+# Pull API keys from Secret Manager (create these secrets first!)
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/GEMINI_API_KEY/versions/latest
+      env: 'GEMINI_KEY'
+    - versionName: projects/$PROJECT_ID/secrets/PERPLEXITY_API_KEY/versions/latest
+      env: 'PERPLEXITY_KEY'
+
+# Final image to track
+images:
+  - '${_IMAGE}:$COMMIT_SHA'
+  - '${_IMAGE}:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
