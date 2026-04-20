@@ -4,10 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>prompt-war-google-ai</title>
+    
+    {/* SEO & Accessibility */}
+    <title>SafeCareer AI | Intelligent Career Decision Risk Analyzer</title>
+    <meta name="description" content="Predict your career risk, automation impact, and upskilling ROI with Google Gemini-powered intelligence." />
+    <meta name="keywords" content="career risk, ai automation, upskilling roi, gemini ai, career analyzer" />
+    
+    {/* Security: Content Security Policy */}
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://www.googletagmanager.com; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.openai.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.unsplash.com https://*.google.com;">
+    
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" role="main" aria-label="SafeCareer AI Application Root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

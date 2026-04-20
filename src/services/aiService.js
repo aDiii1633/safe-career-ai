@@ -30,15 +30,17 @@ Experience: ${experience || 0} years
 Current Skills: ${(currentSkills || []).join(', ')}
 Target Skills: ${(requiredSkills || []).join(', ')}
 Upskill Budget: $${eduCost || 0}
+Problem Focus: ${userData.problemFocus || "General Career Stability"}
 
 Evaluation Framework:
 1. Automation Risk: Analyze exposure to LLMs, robotic process automation, and autonomous agents.
 2. Skill Gap: Direct delta between current competencies and market-required proficiencies.
 3. Sector Stability: 5-year sector viability based on Search and Market trends.
-4. ROI: Amortization of the upskill budget against projected salary gains.
+4. Problem Alignment: How well this role solves the user's specific problem focus (e.g., Sustainability, AI Ethics).
+5. Relocation Velocity: Geographic demand shifts based on Google Maps labor heatmaps (Simulated).
 
 Example Analysis Output (Few-Shot):
-Input: Product Manager, Tech, 5 yrs, [Scrum, Jira], [Technical Case Study, Python], $2000
+Input: Product Manager, Tech, 5 yrs, [Scrum, Jira], [Technical Case Study, Python], $2000, "AI Safety"
 Output: {
   "automationRiskScore": 22,
   "skillGapScore": 35,
@@ -47,6 +49,8 @@ Output: {
   "financeLevel": "Low",
   "roiTimeline": "1 Year",
   "personalAlignmentScore": 85,
+  "problemAlignmentScore": 92,
+  "relocationRisk": 12,
   "keyVulnerabilities": ["AI-driven roadmap automation", "Technical skill gap in Python"],
   "safeSkills": ["Stakeholder Management", "Strategic Vision", "Empathy"],
   "missingSkills": ["Python", "Data Orchestration", "AI Ethics"],
@@ -88,6 +92,8 @@ Output MUST be a single, valid JSON object matching the schema. No conversationa
       financeLevel:        ai.financeLevel || 'Medium',
       roiTimeline:         ai.roiTimeline || '2 Years',
       personalAlignment:   ai.personalAlignmentScore || 50,
+      problemAlignment:    ai.problemAlignmentScore || 50,
+      relocationRisk:      ai.relocationRisk || 10,
       keyVulnerabilities:  ai.keyVulnerabilities || [],
       safeSkills:          ai.safeSkills || [],
     };

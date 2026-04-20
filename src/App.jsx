@@ -4,14 +4,15 @@ import { Shield, Moon, Sun, History } from 'lucide-react';
 import LandingPage from './pages/LandingPage';
 import AnalyzerPage from './pages/AnalyzerPage';
 import { ThemeProvider, ThemeContext } from './ThemeContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // We abstract the Nav and App layout inside a component under Router and Provider
 const AppContent = () => {
   const navigate = useNavigate();
+  const { currentUser, login, signup, logout, loginWithGoogle, isFirebaseReady } = useAuth();
   
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [isHistoryModalOpen, setHistoryModalOpen] = useState(false);
-  const [userAuth, setUserAuth] = useState(localStorage.getItem('userEmail') || null);
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
@@ -19,17 +20,18 @@ const AppContent = () => {
     setHistory(JSON.parse(localStorage.getItem('careerHistory') || '[]'));
   }, [isHistoryModalOpen]); // refresh when opened
 
-  const login = (e) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
-    localStorage.setItem('userEmail', email);
-    setUserAuth(email);
-    setAuthModalOpen(false);
-  };
-  
-  const logout = () => {
-    localStorage.removeItem('userEmail');
-    setUserAuth(null);
+    const password = e.target.password.value;
+    try {
+      if (isFirebaseReady) {
+        await login(email, password);
+      }
+      setAuthModalOpen(false);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const navToHome = () => navigate('/');
@@ -72,9 +74,9 @@ const AppContent = () => {
                <History size={18}/> History
             </button>
             
-            {userAuth ? (
+            {currentUser ? (
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                 <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{userAuth}</span>
+                 <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{currentUser.email}</span>
                  <button className="clay-btn primary" onClick={logout}>Sign Out</button>
               </div>
             ) : (
@@ -95,10 +97,15 @@ const AppContent = () => {
         <div className="auth-modal fade-in" onClick={(e) => e.target.className.includes('auth-modal') && setAuthModalOpen(false)}>
            <div className="clay-panel auth-box">
               <h2 style={{ marginBottom: '2rem', textAlign: 'center' }}>Sign In to SafeCareer</h2>
-              <form onSubmit={login} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                  <input className="clay-input" type="email" name="email" placeholder="Email Address" required />
                  <input className="clay-input" type="password" name="password" placeholder="Password" required />
                  <button type="submit" className="clay-btn primary" style={{ width: '100%', marginTop: '0.5rem' }}>Continue</button>
+                 {isFirebaseReady && (
+                   <button type="button" onClick={loginWithGoogle} className="clay-btn" style={{ background: 'rgba(66, 133, 244, 0.1)', border: 'none' }}>
+                     Continue with Google
+                   </button>
+                 )}
               </form>
            </div>
         </div>
@@ -135,9 +142,11 @@ const AppContent = () => {
 function App() {
   return (
     <ThemeProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

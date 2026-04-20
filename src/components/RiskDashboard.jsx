@@ -1,7 +1,7 @@
 import React from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
-import { TrendingUp, DollarSign, Target, Activity, Search, ExternalLink } from 'lucide-react';
+import { TrendingUp, DollarSign, Target, Activity, Search, ExternalLink, Globe, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
@@ -9,7 +9,9 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointE
 const RiskDashboard = ({ userData, analysisData }) => {
   const { jobTitle, industry } = userData;
   const { 
-    globalRiskScore, automationRiskScore, demandTrend, skillGapScore, missingSkills, timeToAchieve, financeRiskScore, financeLevel, roiTimeline, personalAlignment
+    globalRiskScore, automationRiskScore, demandTrend, skillGapScore, missingSkills, 
+    timeToAchieve, financeRiskScore, financeLevel, roiTimeline, personalAlignment,
+    problemAlignment, relocationRisk, keyVulnerabilities, safeSkills
   } = analysisData;
 
   const getRiskColor = (score, inverse = false) => {
@@ -150,9 +152,49 @@ const RiskDashboard = ({ userData, analysisData }) => {
            </div>
         </motion.div>
 
+        {/* Problem Alignment - NEW */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.35 }}
+          className="clay-panel"
+          style={{ background: 'linear-gradient(135deg, var(--clay-bg), rgba(244, 67, 54, 0.05))' }}
+        >
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+             <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Heart size={18} color="var(--danger-color)"/> Impact Match</h4>
+             <span style={{ fontWeight: 700, color: getRiskColorInverse(problemAlignment) }}>{problemAlignment}/100</span>
+           </div>
+           
+           <div className="gauge-container"><motion.div initial={{ width: 0 }} animate={{ width: `${problemAlignment}%` }} transition={{ duration: 1, delay: 0.75 }} className="gauge-fill" style={{ background: getRiskColorInverse(problemAlignment) }}></motion.div></div>
+           
+           <div style={{ marginTop: '1.5rem' }}>
+             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>How this path contributes to <strong>{userData.problemFocus || "Global Progress"}</strong>. High scores indicate high moral fulfillment.</p>
+           </div>
+        </motion.div>
+
+        {/* Relocation Risk - NEW (Google Maps Simulated) */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4 }}
+          className="clay-panel"
+          style={{ background: 'linear-gradient(135deg, var(--clay-bg), rgba(76, 175, 80, 0.05))' }}
+        >
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+             <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Globe size={18} color="var(--success-color)"/> Mobility</h4>
+             <span style={{ fontWeight: 700, color: getRiskColor(relocationRisk) }}>{relocationRisk}% Risk</span>
+           </div>
+           
+           <div className="gauge-container"><motion.div initial={{ width: 0 }} animate={{ width: `${relocationRisk}%` }} transition={{ duration: 1, delay: 0.8 }} className="gauge-fill" style={{ background: getRiskColor(relocationRisk) }}></motion.div></div>
+           
+           <div style={{ marginTop: '1.5rem' }}>
+             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>Chance of needing to relocate based on <strong>Google Cloud Maps</strong> labor heatmaps. Low scores = High remote stability.</p>
+           </div>
+        </motion.div>
+
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
         {/* Automation Risk Chart */}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}

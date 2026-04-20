@@ -4,7 +4,7 @@ import { calculateV2Analysis } from '../services/aiService';
 
 const InputForm = ({ onAnalyze }) => {
   const [formData, setFormData] = useState({
-    jobTitle: '', industry: '', experience: '', currentSkills: '', requiredSkills: '', eduCost: ''
+    jobTitle: '', industry: '', experience: '', currentSkills: '', requiredSkills: '', eduCost: '', problemFocus: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -77,7 +77,10 @@ const InputForm = ({ onAnalyze }) => {
           </div>
         </div>
 
-        {/* Interests field removed */}
+        <div className="input-group">
+          <label><Target size={18} strokeWidth={2.5} style={{display:'inline', marginBottom:'-4px', marginRight:'6px', color: 'var(--accent-color)'}}/> Problem Focus / Social Impact (Optional)</label>
+          <input className="clay-input" type="text" name="problemFocus" placeholder="e.g. AI Safety, Climate Tech, Healthcare Equity" value={formData.problemFocus} onChange={handleChange} />
+        </div>
 
         <button type="submit" className="clay-btn primary" disabled={loading} style={{ marginTop: '1rem' }}>
           {loading ? 'Analyzing Data...' : <><Bot size={20} /> Calculate Global Risk Score</>}
