@@ -320,13 +320,22 @@ const LandingPage = () => {
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '540px', margin: '0 auto 2.5rem auto', lineHeight: 1.8 }}>
             Don't leave your career to chance. Let AI guide your next move with precision and data.
           </p>
-          <button
-            className="clay-btn primary"
-            onClick={() => navigate('/analyzer')}
-            style={{ fontSize: '1.1rem', padding: '1.1rem 2.75rem', borderRadius: '100px' }}
-          >
-            Start Your Free Analysis →
-          </button>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button
+              className="clay-btn primary"
+              onClick={() => navigate('/analyzer')}
+              style={{ fontSize: '1.1rem', padding: '1.1rem 2.75rem', borderRadius: '100px' }}
+            >
+              Start Your Free Analysis →
+            </button>
+            <button
+              className="clay-btn"
+              onClick={() => navigate('/pricing')}
+              style={{ fontSize: '1.1rem', padding: '1.1rem 2.75rem', borderRadius: '100px' }}
+            >
+              View Pricing
+            </button>
+          </div>
         </div>
       </div>
 
