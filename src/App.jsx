@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import { Shield, Moon, Sun, History } from 'lucide-react';
 import LandingPage from './pages/LandingPage';
 import AnalyzerPage from './pages/AnalyzerPage';
+import AboutPage from './pages/AboutPage';
+import PricingPage from './pages/PricingPage';
 import { ThemeProvider, ThemeContext } from './ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
@@ -70,6 +72,8 @@ const AppContent = () => {
             SafeCareer AI
           </div>
           <div className="nav-links">
+            <button className="clay-btn" onClick={() => navigate('/about')} style={{ padding: '0.75rem 1.25rem' }}>About</button>
+            <button className="clay-btn" onClick={() => navigate('/pricing')} style={{ padding: '0.75rem 1.25rem' }}>Pricing</button>
             <button className="clay-btn" onClick={() => setHistoryModalOpen(true)} style={{ padding: '0.75rem 1.25rem' }}>
                <History size={18}/> History
             </button>
@@ -90,6 +94,8 @@ const AppContent = () => {
         <Routes>
            <Route path="/" element={<LandingPage />} />
            <Route path="/analyzer" element={<AnalyzerPage />} />
+           <Route path="/about" element={<AboutPage />} />
+           <Route path="/pricing" element={<PricingPage />} />
         </Routes>
       </div>
 

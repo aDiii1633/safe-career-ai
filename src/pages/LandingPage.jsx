@@ -160,6 +160,103 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ===== INTERACTIVE DEMO SECTION — NEW ===== */}
+      <section className="demo-section">
+        <motion.div
+           initial={{ opacity: 0, scale: 0.95 }}
+           whileInView={{ opacity: 1, scale: 1 }}
+           viewport={{ once: true }}
+           transition={{ duration: 0.8 }}
+        >
+          <h2 style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '1.25rem' }}>
+            Seeing is <span style={{ color: 'var(--accent-color)' }}>Believing</span>
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.15rem', maxWidth: '650px', margin: '0 auto 4rem auto', lineHeight: 1.8 }}>
+            Experience the power of SafeCareer AI. Our simulation shows how we analyze 
+            market data to protect your career trajectory in real-time.
+          </p>
+
+          <div className="demo-card-container">
+            <motion.div 
+              className="demo-simulation-card"
+              initial={{ rotateY: -10, rotateX: 5 }}
+              animate={{ rotateY: 10, rotateX: -5 }}
+              transition={{ duration: 5, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+            >
+               {/* Simulated App Header */}
+               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '2rem' }}>
+                  <div style={{ width: '10px', height: '10px', background: 'var(--danger-color)', borderRadius: '50%' }}></div>
+                  <div style={{ width: '10px', height: '10px', background: 'var(--warning-color)', borderRadius: '50%' }}></div>
+                  <div style={{ width: '10px', height: '10px', background: 'var(--success-color)', borderRadius: '50%' }}></div>
+               </div>
+
+               {/* Step 1: Input */}
+               <div style={{ textAlign: 'left', marginBottom: '2rem' }}>
+                 <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem' }}>Current Role</p>
+                 <div className="clay-input" style={{ background: 'white', display: 'flex', justifyContent: 'space-between' }}>
+                   <motion.span
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     transition={{ delay: 1, duration: 2, repeat: Infinity }}
+                   >Graphic Designer</motion.span>
+                   <Cpu size={16} color="var(--accent-color)" />
+                 </div>
+               </div>
+
+               {/* Step 2: Risk Meter */}
+               <div style={{ textAlign: 'left', marginBottom: '2rem' }}>
+                 <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem' }}>Automation Risk</p>
+                 <div className="gauge-container">
+                    <motion.div 
+                      className="gauge-fill" 
+                      style={{ background: 'var(--danger-color)' }}
+                      initial={{ width: '0%' }}
+                      animate={{ width: ['0%', '72%', '72%'] }}
+                      transition={{ duration: 4, repeat: Infinity, times: [0, 0.4, 1] }}
+                    />
+                 </div>
+                 <motion.p 
+                   style={{ marginTop: '0.5rem', fontWeight: 800, color: 'var(--danger-color)', fontSize: '1.2rem' }}
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: [0, 1, 1] }}
+                   transition={{ duration: 4, repeat: Infinity, times: [0, 0.4, 1] }}
+                 >72% High Risk</motion.p>
+               </div>
+
+               {/* Step 3: Skills suggested */}
+               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {['AI Generation', 'Prompt Eng', '3D Design'].map((skill, idx) => (
+                    <motion.span 
+                      key={idx}
+                      className="clay-panel"
+                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.7rem', background: 'rgba(64,144,247,0.1)', border: 'none' }}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 2 + (idx * 0.3), duration: 0.5, repeat: Infinity, repeatDelay: 6 }}
+                    >
+                      +{skill}
+                    </motion.span>
+                  ))}
+               </div>
+
+               <motion.div 
+                 style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(30,142,62,0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1rem' }}
+                 initial={{ opacity: 0, y: 10 }}
+                 animate={{ opacity: [0, 1, 1] }}
+                 transition={{ delay: 3.5, duration: 4, repeat: Infinity, times: [0, 0.2, 1] }}
+               >
+                  <BarChart size={24} color="var(--success-color)" />
+                  <div style={{ textAlign: 'left' }}>
+                     <p style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Projected ROI</p>
+                     <p style={{ fontWeight: 900, color: 'var(--success-color)' }}>+42% Salary Gain</p>
+                  </div>
+               </motion.div>
+
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* ===== AI CHATBOT ===== */}
       <div style={{
         width: '100%',
